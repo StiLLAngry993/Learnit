@@ -1,0 +1,581 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ profile.user.username }} — LearnIt</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <style>
+    :root {
+      --red:      #C0392B;
+      --red-deep: #96281B;
+      --cream:    #F0EBE1;
+      --cream2:   #E0D8CC;
+      --ink:      #1A1210;
+      --gray1:    #8C8074;
+      --gray2:    #B8AD9E;
+      --white:    #FAFAF8;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-cond:    'Barlow Condensed', sans-serif;
+      --font-body:    'Barlow', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── CURSOR ── */
+    .cursor      { position:fixed;width:10px;height:10px;background:var(--red);border-radius:50%;pointer-events:none;z-index:9999; }
+    .cursor-ring { position:fixed;width:32px;height:32px;border:1.5px solid var(--red);border-radius:50%;pointer-events:none;z-index:9998;transition:width .2s,height .2s; }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position:fixed;top:0;left:0;right:0;z-index:200;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 40px;height:60px;
+      background:rgba(240,235,225,.92);
+      backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--cream2);
+    }
+    .nav-logo {
+      font-family:var(--font-display);font-size:1.5rem;letter-spacing:.12em;
+      color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:10px;
+    }
+    .logo-box {
+      width:32px;height:32px;background:var(--red);color:#fff;
+      font-size:.9rem;display:flex;align-items:center;justify-content:center;
+      clip-path: polygon(0 0,90% 0,100% 10%,100% 100%,10% 100%,0 90%);
+    }
+    .nav-logo span { color:var(--red); }
+    .nav-back {
+      display:flex;align-items:center;gap:6px;font-family:var(--font-cond);
+      font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--gray1);text-decoration:none;transition:color .2s;
+    }
+    .nav-back:hover { color:var(--red); }
+
+    /* ══════════════════════════════════════
+       HERO — 3 TRUE COLUMNS
+       Left info | Center character ONLY | Right stats
+    ══════════════════════════════════════ */
+    .hero {
+      display: grid;
+      grid-template-columns: 300px 1fr 300px;
+      height: calc(100vh - 60px);
+      margin-top: 60px;
+      overflow: hidden;
+    }
+
+    /* ── LEFT PANEL ── */
+    .hero-left {
+      background: var(--cream);
+      border-right: 1px solid var(--cream2);
+      padding: 52px 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    /* ── CENTER: CHARACTER COLUMN ── */
+    /* This column is PURELY the character. No text, no overlapping content. */
+    .hero-center {
+      position: relative;
+      background: var(--red);
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    /* diagonal texture on red bg */
+    .hero-center::before {
+      content:'';
+      position:absolute;inset:0;z-index:0;
+      background: repeating-linear-gradient(
+        -45deg,
+        rgba(0,0,0,.06) 0px,rgba(0,0,0,.06) 1px,
+        transparent 1px,transparent 10px
+      );
+    }
+
+    /* giant watermark behind image */
+    .watermark {
+      position:absolute;
+      bottom:-60px; left:50%;
+      transform:translateX(-50%);
+      font-family:var(--font-display);
+      font-size:80vw; line-height:1;
+      color:rgba(255,255,255,.04);
+      pointer-events:none;z-index:0;
+      user-select:none;white-space:nowrap;
+    }
+
+    /* CHARACTER IMAGE — covers entire column top to bottom */
+    .char-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      z-index: 1;
+      /* Default: gray + blurred */
+      filter: grayscale(100%) brightness(.72) blur(2.5px);
+      transform: scale(1.04);
+      transition:
+        filter   .65s cubic-bezier(.25,.46,.45,.94),
+        transform .65s cubic-bezier(.25,.46,.45,.94);
+    }
+
+    /* placeholder when no character uploaded */
+    .char-placeholder {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      filter: grayscale(100%) brightness(.72) blur(2px);
+      transform: scale(1.04);
+      transition: filter .65s, transform .65s;
+    }
+    .char-placeholder-icon { font-size:7rem;color:rgba(255,255,255,.22); }
+    .char-placeholder-text {
+      font-family:var(--font-cond);font-size:.8rem;letter-spacing:.2em;
+      text-transform:uppercase;color:rgba(255,255,255,.28);margin-top:14px;
+    }
+
+    /* HOVER → full colour, sharp, slight zoom */
+    .hero-center:hover .char-img,
+    .hero-center:hover .char-placeholder {
+      filter: grayscale(0%) brightness(1) blur(0px);
+      transform: scale(1.07);
+    }
+
+    /* bottom vignette — always subtly present */
+    .char-vignette {
+      position:absolute;bottom:0;left:0;right:0;height:45%;
+      background: linear-gradient(to top, rgba(96,27,18,.65), transparent);
+      z-index:2;pointer-events:none;
+      transition:opacity .5s;
+    }
+    .hero-center:hover .char-vignette { opacity:.35; }
+
+    /* corner brackets */
+    .char-corner {
+      position:absolute;width:22px;height:22px;
+      border-color:rgba(255,255,255,.5);border-style:solid;
+      z-index:3;transition:border-color .4s;
+    }
+    .hero-center:hover .char-corner { border-color:rgba(255,255,255,.95); }
+    .char-corner.tl{top:16px;left:16px;border-width:2px 0 0 2px;}
+    .char-corner.tr{top:16px;right:16px;border-width:2px 2px 0 0;}
+    .char-corner.bl{bottom:16px;left:16px;border-width:0 0 2px 2px;}
+    .char-corner.br{bottom:16px;right:16px;border-width:0 2px 2px 0;}
+
+    /* "hover to reveal" hint */
+    .char-hint-label {
+      position:absolute;bottom:22px;left:50%;transform:translateX(-50%);
+      font-family:var(--font-cond);font-size:.65rem;letter-spacing:.22em;
+      text-transform:uppercase;color:rgba(255,255,255,.45);
+      z-index:3;transition:opacity .35s;white-space:nowrap;
+    }
+    .hero-center:hover .char-hint-label { opacity:0; }
+
+    /* ── RIGHT PANEL ── */
+    .hero-right {
+      background: var(--cream);
+      border-left: 1px solid var(--cream2);
+      padding: 52px 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    /* ━━━ LEFT CONTENT ━━━ */
+    .rank-tag {
+      font-family:var(--font-cond);font-size:.72rem;letter-spacing:.22em;
+      text-transform:uppercase;border:1px solid currentColor;
+      display:inline-block;padding:3px 10px;margin-bottom:18px;width:fit-content;
+    }
+    .profile-name {
+      font-family:var(--font-display);font-size:3.8rem;line-height:.92;
+      letter-spacing:.04em;color:var(--ink);margin-bottom:6px;
+    }
+    .profile-handle {
+      font-family:var(--font-cond);font-size:.85rem;letter-spacing:.1em;
+      color:var(--gray1);margin-bottom:22px;
+    }
+    .avatar-row { display:flex;align-items:center;gap:12px;margin-bottom:18px; }
+    .profile-avatar {
+      width:48px;height:48px;border-radius:50%;object-fit:cover;
+      border:2px solid var(--red);flex-shrink:0;
+    }
+    .profile-avatar-ph {
+      width:48px;height:48px;border-radius:50%;flex-shrink:0;
+      background:var(--red);color:#fff;
+      font-family:var(--font-display);font-size:1.5rem;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .avatar-meta {
+      font-family:var(--font-cond);font-size:.72rem;letter-spacing:.08em;
+      text-transform:uppercase;color:var(--gray1);
+    }
+    .profile-intro {
+      font-size:.88rem;line-height:1.65;color:var(--gray1);
+      border-left:2px solid var(--red);padding-left:12px;margin-bottom:28px;
+    }
+    .btn-edit {
+      display:inline-flex;align-items:center;gap:8px;width:fit-content;
+      font-family:var(--font-cond);font-size:.78rem;letter-spacing:.15em;
+      text-transform:uppercase;background:transparent;border:1px solid var(--ink);
+      color:var(--ink);padding:9px 18px;text-decoration:none;
+      transition:background .2s,color .2s;
+    }
+    .btn-edit:hover { background:var(--ink);color:var(--cream); }
+
+    /* ━━━ RIGHT CONTENT ━━━ */
+    .section-title {
+      font-family:var(--font-cond);font-size:.68rem;letter-spacing:.22em;
+      text-transform:uppercase;color:var(--red);margin-bottom:14px;
+    }
+    .stats-grid {
+      display:grid;grid-template-columns:1fr 1fr;gap:1px;
+      background:var(--cream2);border:1px solid var(--cream2);margin-bottom:28px;
+    }
+    .stat-cell { background:var(--cream);padding:16px 18px; }
+    .stat-num {
+      font-family:var(--font-display);font-size:2.2rem;color:var(--ink);line-height:1;
+    }
+    .stat-lbl {
+      font-family:var(--font-cond);font-size:.65rem;letter-spacing:.15em;
+      text-transform:uppercase;color:var(--gray1);margin-top:3px;
+    }
+    .ability-list { display:flex;flex-direction:column; }
+    .ability-item { padding:13px 0;border-bottom:1px solid var(--cream2); }
+    .ability-item:first-child { border-top:1px solid var(--cream2); }
+    .ability-type {
+      font-family:var(--font-cond);font-size:.62rem;letter-spacing:.2em;
+      text-transform:uppercase;color:var(--red);margin-bottom:3px;
+    }
+    .ability-name {
+      font-family:var(--font-display);font-size:1.2rem;letter-spacing:.06em;color:var(--ink);
+    }
+
+    /* ══════════════════════════════════════
+       BELOW-HERO SECTIONS
+    ══════════════════════════════════════ */
+    .section-wrap {
+      padding:56px 40px;border-top:1px solid var(--cream2);
+      opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s;
+    }
+    .section-wrap.visible { opacity:1;transform:none; }
+    .section-label {
+      font-family:var(--font-display);font-size:1.9rem;letter-spacing:.08em;
+      color:var(--ink);margin-bottom:28px;
+      display:flex;align-items:center;gap:16px;
+    }
+    .section-label::after { content:'';flex:1;height:1px;background:var(--cream2); }
+
+    .badges-row { display:flex;flex-wrap:wrap;gap:14px; }
+    .badge-item {
+      display:flex;flex-direction:column;align-items:center;gap:8px;
+      padding:18px 22px;background:var(--white);border:1px solid var(--cream2);
+      min-width:100px;transition:border-color .2s,transform .2s;cursor:default;
+    }
+    .badge-item:hover { border-color:var(--red);transform:translateY(-3px); }
+    .badge-item.locked { opacity:.3;filter:grayscale(1); }
+    .badge-icon { font-size:1.6rem; }
+    .badge-name {
+      font-family:var(--font-cond);font-size:.68rem;letter-spacing:.1em;
+      text-transform:uppercase;color:var(--gray1);text-align:center;
+    }
+
+    .posts-list { display:flex;flex-direction:column; }
+    .mini-post {
+      display:grid;grid-template-columns:1fr auto auto auto;
+      align-items:center;gap:20px;
+      padding:16px 0;border-bottom:1px solid var(--cream2);
+      text-decoration:none;color:inherit;transition:padding-left .15s;
+    }
+    .mini-post:first-child { border-top:1px solid var(--cream2); }
+    .mini-post:hover { padding-left:10px; }
+    .mini-post-title {
+      font-family:var(--font-cond);font-size:1rem;letter-spacing:.04em;
+      color:var(--ink);font-weight:600;
+    }
+    .mini-post-meta {
+      font-family:var(--font-cond);font-size:.72rem;letter-spacing:.08em;
+      text-transform:uppercase;color:var(--gray1);
+    }
+    .mini-post-pts { font-family:var(--font-display);font-size:1rem;letter-spacing:.06em; }
+    .badge-pill { font-family:var(--font-cond);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px; }
+    .badge-green { background:rgba(39,174,96,.1);color:#1e8449; }
+    .badge-blue  { background:rgba(41,128,185,.1);color:#1a5276; }
+    .text-success { color:#1e8449; }
+    .text-blue    { color:#1a5276; }
+    .empty-posts {
+      font-family:var(--font-cond);font-size:.9rem;letter-spacing:.08em;
+      color:var(--gray2);padding:40px 0;text-align:center;
+    }
+
+    /* ══════════════════════════════════════
+       MODAL
+    ══════════════════════════════════════ */
+    .modal-overlay {
+      position:fixed;inset:0;z-index:500;
+      background:rgba(26,18,16,.8);backdrop-filter:blur(6px);
+      display:none;align-items:center;justify-content:center;
+    }
+    .modal-overlay.open { display:flex; }
+    .modal { background:var(--cream);width:100%;max-width:460px;padding:44px;position:relative; }
+    .modal-close { position:absolute;top:18px;right:18px;background:none;border:none;font-size:1rem;cursor:pointer;color:var(--gray1); }
+    .modal-title { font-family:var(--font-display);font-size:2rem;color:var(--ink);margin-bottom:4px; }
+    .modal-title span { color:var(--red); }
+    .modal-sub { font-size:.85rem;color:var(--gray1);margin-bottom:26px; }
+    .field { margin-bottom:18px; }
+    .field label {
+      display:block;font-family:var(--font-cond);font-size:.68rem;
+      letter-spacing:.15em;text-transform:uppercase;color:var(--gray1);margin-bottom:5px;
+    }
+    .field input,.field textarea {
+      width:100%;background:var(--white);border:1px solid var(--cream2);
+      padding:9px 12px;font-family:var(--font-body);font-size:.9rem;
+      color:var(--ink);outline:none;transition:border-color .2s;resize:vertical;
+    }
+    .field input:focus,.field textarea:focus { border-color:var(--red); }
+    .upload-zone {
+      border:1px dashed var(--cream2);padding:18px;text-align:center;
+      cursor:pointer;position:relative;transition:border-color .2s;
+    }
+    .upload-zone:hover { border-color:var(--red); }
+    .upload-zone input { position:absolute;inset:0;opacity:0;cursor:pointer; }
+    .upload-text { font-family:var(--font-cond);font-size:.78rem;color:var(--gray1); }
+    .btn-save {
+      width:100%;padding:13px;background:var(--red);color:#fff;border:none;
+      font-family:var(--font-display);font-size:1.15rem;letter-spacing:.1em;
+      cursor:pointer;transition:background .2s;
+    }
+    .btn-save:hover { background:var(--red-deep); }
+
+    @media(max-width:860px){
+      .hero { grid-template-columns:1fr;grid-template-rows:auto 70vw auto;height:auto; }
+      .hero-left,.hero-right { padding:32px 24px; }
+      .profile-name { font-size:2.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="{% url 'explore_communities' %}" class="nav-logo">
+    <div class="logo-box">LI</div>
+    LEARN<span>IT</span>
+  </a>
+  <a href="{% url 'explore_communities' %}" class="nav-back">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Communities
+  </a>
+</nav>
+
+<!-- ══ HERO: 3 CLEAN COLUMNS ══ -->
+<div class="hero">
+
+  <!-- LEFT — profile info only -->
+  <div class="hero-left">
+    <div class="rank-tag" style="color:{{ profile.rank_color }};border-color:{{ profile.rank_color }}">
+      ⬡ {{ profile.rank|upper }}
+    </div>
+    <h1 class="profile-name">{{ profile.user.first_name|default:profile.user.username|upper }}</h1>
+    <div class="profile-handle">@{{ profile.user.username }}</div>
+    <div class="avatar-row">
+      {% if profile.avatar %}
+        <img src="{{ profile.avatar.url }}" class="profile-avatar" alt="Avatar">
+      {% else %}
+        <div class="profile-avatar-ph">{{ profile.user.username|first|upper }}</div>
+      {% endif %}
+      <div class="avatar-meta">Joined {{ profile.created_at|date:"M Y" }}</div>
+    </div>
+    <p class="profile-intro">{{ profile.intro|default:"No intro yet." }}</p>
+    {% if is_own_profile %}
+    <a href="#" class="btn-edit" onclick="openModal(event)">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Edit Profile
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- CENTER — character image ONLY, full height, nothing else -->
+  <div class="hero-center">
+    <div class="watermark">{{ profile.user.username|first|upper }}</div>
+
+    {% if profile.character_image %}
+      <img src="{{ profile.character_image.url }}" class="char-img" alt="Character">
+    {% else %}
+      <div class="char-placeholder">
+        <div class="char-placeholder-icon">⚔</div>
+        <div class="char-placeholder-text">No character yet</div>
+      </div>
+    {% endif %}
+
+    <div class="char-vignette"></div>
+    <div class="char-corner tl"></div>
+    <div class="char-corner tr"></div>
+    <div class="char-corner bl"></div>
+    <div class="char-corner br"></div>
+    <div class="char-hint-label">Hover to reveal</div>
+  </div>
+
+  <!-- RIGHT — stats & abilities only -->
+  <div class="hero-right">
+    <div class="section-title">Stats</div>
+    <div class="stats-grid">
+      <div class="stat-cell">
+        <div class="stat-num">{{ profile.points }}</div>
+        <div class="stat-lbl">Points</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num">{{ profile.user.posts.count }}</div>
+        <div class="stat-lbl">Posted</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num">0</div>
+        <div class="stat-lbl">Solved</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num">0</div>
+        <div class="stat-lbl">Pts Earned</div>
+      </div>
+    </div>
+    <div class="section-title">Abilities</div>
+    <div class="ability-list">
+      <div class="ability-item">
+        <div class="ability-type">Tactical Ability</div>
+        <div class="ability-name">KNOWLEDGE SEEKER</div>
+      </div>
+      <div class="ability-item">
+        <div class="ability-type">Passive Ability</div>
+        <div class="ability-name">PROBLEM SOLVER</div>
+      </div>
+      <div class="ability-item">
+        <div class="ability-type">Ultimate Ability</div>
+        <div class="ability-name">COMMUNITY LEADER</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /hero -->
+
+<!-- BADGES -->
+<div class="section-wrap">
+  <div class="section-label">Badges</div>
+  <div class="badges-row">
+    <div class="badge-item"><div class="badge-icon">⚡</div><div class="badge-name">Early Adopter</div></div>
+    <div class="badge-item"><div class="badge-icon">🎖</div><div class="badge-name">300 Club</div></div>
+    <div class="badge-item locked"><div class="badge-icon">🔥</div><div class="badge-name">First Solve</div></div>
+    <div class="badge-item locked"><div class="badge-icon">👑</div><div class="badge-name">Elite Solver</div></div>
+    <div class="badge-item locked"><div class="badge-icon">⚔</div><div class="badge-name">Duel Master</div></div>
+    <div class="badge-item locked"><div class="badge-icon">💎</div><div class="badge-name">1000 Points</div></div>
+  </div>
+</div>
+
+<!-- POSTS -->
+<div class="section-wrap">
+  <div class="section-label">Posted Problems</div>
+  <div class="posts-list">
+    {% if profile.user.posts.all %}
+      {% for post in profile.user.posts.all %}
+      <a href="{% url 'post_detail' post.id %}" class="mini-post">
+        <div class="mini-post-title">{{ post.title }}</div>
+        <span class="badge-pill {% if post.is_solved %}badge-green{% else %}badge-blue{% endif %}">{% if post.is_solved %}Solved{% else %}Open{% endif %}</span>
+        <span class="mini-post-meta">{{ post.created_at|date:"M d, Y" }}</span>
+        <span class="mini-post-pts {% if post.is_solved %}text-success{% else %}text-blue{% endif %}">{{ post.reward_points }} pts</span>
+      </a>
+      {% endfor %}
+    {% else %}
+      <div class="empty-posts">No problems posted yet.</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+{% if is_own_profile %}
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2 class="modal-title">EDIT <span>PROFILE</span></h2>
+    <p class="modal-sub">Update your info below.</p>
+    <form method="POST" action="{% url 'edit_profile' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="field">
+        <label>Username</label>
+        <input type="text" name="username" value="{{ profile.user.username }}">
+      </div>
+      <div class="field">
+        <label>Bio</label>
+        <textarea name="intro" style="height:80px">{{ profile.intro }}</textarea>
+      </div>
+      <div class="field">
+        <label>Profile Picture</label>
+        <div class="upload-zone">
+          <input type="file" name="avatar" accept="image/*">
+          <div class="upload-text">Click to upload new photo</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Character Image</label>
+        <div class="upload-zone">
+          <input type="file" name="character_image" accept="image/*">
+          <div class="upload-text">Click to upload character</div>
+        </div>
+      </div>
+      <button type="submit" class="btn-save">Save Changes</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<script>
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => {
+    mx=e.clientX; my=e.clientY;
+    cursor.style.transform=`translate(${mx-5}px,${my-5}px)`;
+  });
+  (function animRing(){
+    rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+    ring.style.transform=`translate(${rx-16}px,${ry-16}px)`;
+    requestAnimationFrame(animRing);
+  })();
+  document.querySelectorAll('a,button,input,textarea').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{ring.style.width='44px';ring.style.height='44px';});
+    el.addEventListener('mouseleave',()=>{ring.style.width='32px';ring.style.height='32px';});
+  });
+
+  const obs = new IntersectionObserver(
+    es => es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }),
+    { threshold:0.08 }
+  );
+  document.querySelectorAll('.section-wrap').forEach(el=>obs.observe(el));
+
+  function openModal(e) { e.preventDefault(); document.getElementById('editModal').classList.add('open'); }
+  function closeModal()  { document.getElementById('editModal').classList.remove('open'); }
+  document.getElementById('editModal')?.addEventListener('click',function(e){ if(e.target===this) closeModal(); });
+</script>
+</body>
+</html>

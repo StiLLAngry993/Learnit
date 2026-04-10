@@ -1,0 +1,650 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ post.title }} — LearnIt</title>
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+<style>
+:root {
+  --cream: #F0EBE1;
+  --cream-2: #E0D8CC;
+  --ink: #1A1210;
+  --red: #C0392B;
+  --red-deep: #96281B;
+  --white-soft: #FAFAF8;
+
+  --success: #2E8B57;
+  --danger: #C0392B;
+
+  /* Compatibility aliases */
+  --blue: var(--red);
+  --blue-dim: var(--red-deep);
+  --white: var(--white-soft);
+  --white-dim: #4A3F39;
+  --gray: #6A5F57;
+  --gray2: #8A7F77;
+  --dark3: var(--white-soft);
+  --dark4: var(--cream-2);
+}
+
+body {
+  cursor: none;
+  background: var(--cream);
+  color: var(--ink);
+}
+
+/* NAVBAR */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.85rem 2rem;
+  background: rgba(240, 235, 225, 0.92);
+  border-bottom: 1px solid rgba(192, 57, 43, 0.12);
+  backdrop-filter: blur(16px);
+}
+
+.nav-logo {
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  letter-spacing: 3px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.nav-logo .logo-box {
+  width: 30px;
+  height: 30px;
+  background: var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: #fff;
+  clip-path: var(--clip-sm);
+}
+
+.nav-logo span {
+  color: var(--red);
+}
+
+.nav-back {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--gray);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nav-back:hover {
+  color: var(--red);
+}
+
+/* PAGE */
+.page-wrap {
+  padding: 5.5rem 2rem 3rem;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* POST */
+.post-card {
+  background: var(--white-soft);
+  border: 1px solid rgba(192, 57, 43, 0.15);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  clip-path: var(--clip-lg);
+  position: relative;
+}
+
+.post-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: {% if post.is_solved %}var(--success){% else %}var(--red){% endif %};
+}
+
+.post-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.post-title {
+  font-family: var(--font-title);
+  font-size: 2rem;
+  letter-spacing: 2px;
+  line-height: 1.1;
+}
+
+.post-author-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.author-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--red);
+  object-fit: cover;
+}
+
+.author-avatar-ph {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--red);
+  background: var(--cream-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--red);
+}
+
+.author-info a {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--red);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+
+.author-info a:hover {
+  text-decoration: underline;
+}
+
+.post-time {
+  font-size: 0.75rem;
+  color: var(--gray2);
+  font-family: var(--font-mono);
+}
+
+.post-body {
+  font-size: 0.95rem;
+  color: var(--ink);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+
+/* CODE BLOCK */
+.code-block {
+  background: var(--cream);
+  border: 1px solid rgba(26, 18, 16, 0.08);
+  border-left: 3px solid var(--red);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+}
+
+.code-label {
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.code-block pre {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* ERROR */
+.error-block {
+  background: rgba(192, 57, 43, 0.05);
+  border: 1px solid rgba(192, 57, 43, 0.15);
+  border-left: 3px solid var(--danger);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.error-block pre {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--red);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* FOOTER */
+.post-footer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(26, 18, 16, 0.08);
+  flex-wrap: wrap;
+}
+
+.reward-badge {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--success);
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  padding: 0.3rem 0.75rem;
+}
+
+/* LIKE BUTTON */
+.btn-like {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1px solid var(--gray2);
+  color: var(--gray);
+  padding: 0.4rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: none;
+  transition: all 0.2s;
+  clip-path: var(--clip-sm);
+}
+
+.btn-like:hover,
+.btn-like.liked {
+  border-color: var(--red);
+  color: var(--red);
+  background: rgba(192, 57, 43, 0.08);
+}
+
+/* SOLVED BANNER */
+.solved-banner {
+  background: rgba(34, 197, 94, 0.07);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-left: 3px solid var(--success);
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.solved-banner .icon {
+  font-size: 1.3rem;
+}
+
+.solved-text {
+  font-size: 0.9rem;
+  color: var(--success);
+}
+
+.solved-text strong {
+  font-family: var(--font-mono);
+}
+
+/* COMMENTS */
+.comments-section {
+  margin-bottom: 2rem;
+}
+
+.comments-title {
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+  margin-bottom: 1.25rem;
+}
+
+.comments-title span {
+  color: var(--red);
+}
+
+.comment-card {
+  background: var(--white-soft);
+  border: 1px solid rgba(26, 18, 16, 0.08);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 0.75rem;
+  clip-path: var(--clip-md);
+  position: relative;
+}
+
+.comment-card.correct-answer {
+  border-color: rgba(34, 197, 94, 0.3);
+  background: rgba(34, 197, 94, 0.04);
+}
+
+.comment-card.correct-answer::before {
+  content: '✓ CORRECT ANSWER';
+  position: absolute;
+  top: -1px;
+  right: 1.5rem;
+  background: var(--success);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 0.15rem 0.6rem;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.comment-avatar,
+.comment-avatar-ph {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--red);
+}
+
+.comment-avatar-ph {
+  background: var(--cream-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--red);
+}
+
+.comment-author a {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--red);
+  text-decoration: none;
+}
+
+.comment-time {
+  font-size: 0.7rem;
+  color: var(--gray2);
+  font-family: var(--font-mono);
+  margin-left: auto;
+}
+
+.comment-body {
+  font-size: 0.9rem;
+  color: var(--ink);
+  line-height: 1.7;
+  margin-bottom: 0.75rem;
+}
+
+/* ADD COMMENT */
+.btn-comment-submit {
+  background: var(--red);
+  border: none;
+  color: #fff;
+  padding: 0.7rem 2rem;
+  font-family: var(--font-title);
+  font-size: 1rem;
+  letter-spacing: 2px;
+  cursor: none;
+  transition: background 0.2s;
+  clip-path: var(--clip-sm);
+}
+
+.btn-comment-submit:hover {
+  background: var(--red-deep);
+}
+
+.solved-notice {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--gray);
+  font-size: 0.9rem;
+  border: 1px dashed rgba(34, 197, 94, 0.2);
+  background: rgba(34, 197, 94, 0.03);
+}
+
+.solved-notice span {
+  color: var(--success);
+  font-weight: 700;
+}
+</style>
+
+
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="grid-bg"></div>
+
+<nav class="navbar">
+  <a href="{% url 'explore_communities' %}" class="nav-logo">
+    <div class="logo-box">LI</div>
+    LEARN<span>IT</span>
+  </a>
+  <a href="{% url 'explore_communities' %}" class="nav-back">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Community
+  </a>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- Solved banner -->
+  {% if post.is_solved %}
+  <div class="solved-banner">
+    <span class="icon">✅</span>
+    <div class="solved-text">
+      This problem is <strong>SOLVED</strong> — answered by <strong>@{{ post.correct_comment.author.username }}</strong> and awarded <strong>{{ post.reward_points }} points</strong>.
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- POST -->
+  <div class="post-card">
+    <div class="post-top">
+      <h1 class="post-title">{{ post.title }}</h1>
+      <span class="badge {% if post.is_solved %}badge-green{% else %}badge-blue{% endif %}">
+        {% if post.is_solved %}Solved{% else %}Open{% endif %}
+      </span>
+    </div>
+
+    <div class="post-author-row">
+      {% if post.author.profile.avatar %}
+        <img src="{{ post.author.profile.avatar.url }}" class="author-avatar" alt="">
+      {% else %}
+        <div class="author-avatar-ph">{{ post.author.username|first|upper }}</div>
+      {% endif %}
+      <div class="author-info">
+        <a href="{% url 'user_profile' post.author.username %}">@{{ post.author.username }}</a>
+        <div class="post-time">{{ post.created_at|date:"M d, Y · H:i" }}</div>
+      </div>
+    </div>
+
+    <p class="post-body">{{ post.description }}</p>
+
+    {% if post.code %}
+    <div class="code-block">
+      <div class="code-label">Code</div>
+      <pre>{{ post.code }}</pre>
+    </div>
+    {% endif %}
+
+    {% if post.error_message %}
+    <div class="error-block">
+      <div class="code-label" style="color:var(--danger)">Error</div>
+      <pre>{{ post.error_message }}</pre>
+    </div>
+    {% endif %}
+
+    <div class="post-footer">
+      <span class="reward-badge">⬡ {{ post.reward_points }} pts reward</span>
+
+      {% if post.is_solved %}
+      <button class="btn-like {% if user_liked %}liked{% endif %}" onclick="toggleLike(this)">
+        ♥ {{ post.likes }} Like{% if post.likes != 1 %}s{% endif %}
+      </button>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- COMMENTS -->
+  <div class="comments-section">
+    <h2 class="comments-title">SOLUTIONS <span>({{ post.comments.count }})</span></h2>
+
+    {% for comment in post.comments.all %}
+    <div class="comment-card {% if comment.is_correct %}correct-answer{% endif %}">
+      <div class="comment-header">
+        {% if comment.author.profile.avatar %}
+          <img src="{{ comment.author.profile.avatar.url }}" class="comment-avatar" alt="">
+        {% else %}
+          <div class="comment-avatar-ph">{{ comment.author.username|first|upper }}</div>
+        {% endif %}
+        <div class="comment-author">
+          <a href="{% url 'user_profile' comment.author.username %}">@{{ comment.author.username }}</a>
+        </div>
+        <span class="comment-time">{{ comment.created_at|timesince }} ago</span>
+      </div>
+
+      <div class="comment-body">{{ comment.body }}</div>
+
+      {% if comment.code %}
+      <div class="comment-code">
+        <pre>{{ comment.code }}</pre>
+      </div>
+      {% endif %}
+
+      {% if comment.file %}
+      <div class="file-section">
+        <span class="file-icon">📎</span>
+        <span class="file-name">{{ comment.file.name|slice:"6:" }}</span>
+        <a href="{{ comment.file.url }}" target="_blank" class="btn-view-file">View</a>
+        {% if comment.is_correct %}
+          {% if user == post.author or user_gave_points %}
+            <a href="{{ comment.file.url }}" download class="btn-download">
+              ↓ Download
+            </a>
+          {% else %}
+            <span class="btn-locked">🔒 Give points to download</span>
+          {% endif %}
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <div class="comment-footer">
+        <!-- Mark as correct — only post author, only if not solved yet -->
+        {% if user == post.author and not post.is_solved %}
+        <form method="POST" action="/post/{{ post.id }}/mark-correct/{{ comment.id }}/" class="mark-correct-form">
+          {% csrf_token %}
+          <span class="pts-label">Award points:</span>
+          <input type="number" name="points" min="10" value="{{ post.reward_points }}" placeholder="min 10">
+          <button type="submit" class="btn-mark-correct">
+            ✓ Mark Correct
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    {% empty %}
+    <div style="text-align:center;padding:2.5rem;color:var(--gray2);font-size:0.9rem;border:1px dashed rgba(255,255,255,0.06)">
+      No solutions yet. Be the first to solve it.
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- ADD COMMENT -->
+  {% if post.is_solved %}
+  <div class="solved-notice">
+    This problem has been <span>solved</span>. Comments are closed.
+  </div>
+  {% elif user == post.author %}
+  <div class="solved-notice">
+    You can't comment on your own problem.
+  </div>
+  {% else %}
+  <div class="add-comment">
+    <h3 class="comment-form-title">POST YOUR SOLUTION</h3>
+
+    {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="POST" action="/post/{{ post.id }}/comment/" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="field">
+        <label>Your Solution</label>
+        <textarea name="body" placeholder="Explain your solution clearly..." style="height:100px" required></textarea>
+      </div>
+      <div class="field">
+        <label>Solution Code (optional)</label>
+        <textarea name="code" placeholder="Paste your fix here..." style="height:120px;font-family:var(--font-mono);font-size:0.8rem"></textarea>
+      </div>
+      <div class="field">
+        <label>Attach a File (optional)</label>
+        <div style="border:1px dashed rgba(59,130,246,0.3);padding:1.25rem;text-align:center;position:relative;background:rgba(59,130,246,0.03);transition:all 0.2s">
+          <input type="file" name="file" style="position:absolute;inset:0;opacity:0;cursor:none;width:100%;height:100%" onchange="showCommentFile(this)">
+          <div style="font-size:0.85rem;color:var(--gray)">📎 Attach your solution file</div>
+          <div id="commentFileName" style="font-family:var(--font-mono);font-size:0.78rem;color:var(--blue);margin-top:0.4rem;display:none"></div>
+        </div>
+      </div>
+      <button type="submit" class="btn-comment-submit">
+        Submit Solution
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </form>
+  </div>
+  {% endif %}
+
+</div>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => {
+    mx=e.clientX; my=e.clientY;
+    cursor.style.transform=`translate(${mx-5}px,${my-5}px)`;
+  });
+  (function animRing(){
+    rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+    ring.style.transform=`translate(${rx-16}px,${ry-16}px)`;
+    requestAnimationFrame(animRing);
+  })();
+  document.querySelectorAll('a,button,input,textarea').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{ring.style.width='44px';ring.style.height='44px';});
+    el.addEventListener('mouseleave',()=>{ring.style.width='32px';ring.style.height='32px';});
+  });
+
+  function toggleLike(btn) {
+    btn.classList.toggle('liked');
+  }
+
+  function showCommentFile(input) {
+    const el = document.getElementById('commentFileName');
+    if (input.files && input.files[0]) {
+      el.textContent = '📎 ' + input.files[0].name;
+      el.style.display = 'block';
+    }
+  }
+</script>
+</body>
+</html>

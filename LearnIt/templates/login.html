@@ -1,0 +1,213 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — LearnIt</title>
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <style>
+    /* Applying your custom color palette */
+    :root {
+      --bg-cream: #F0EBE1;
+      --bg-cream-2: #E0D8CC;
+      --text-ink: #1A1210;
+      --accent-red: #C0392B;
+      --accent-red-deep: #96281B;
+      --card-white: #FAFAF8;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--text-ink);
+    }
+
+    .login-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      background-color: var(--bg-cream); /* Replaces dark blue */
+    }
+
+    .login-card {
+      background: var(--card-white); /* Replaces semi-transparent dark */
+      border: 1px solid var(--bg-cream-2); /* Secondary background for borders */
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 420px;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 10px 30px rgba(26, 18, 16, 0.05); /* Soft ink-colored shadow */
+      clip-path: var(--clip-lg);
+    }
+
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent-red), transparent);
+    }
+
+    .card-title {
+      font-family: var(--font-title);
+      font-size: 2.8rem;
+      letter-spacing: 3px;
+      margin-bottom: 0.25rem;
+      color: var(--text-ink);
+    }
+
+    .card-title span { color: var(--accent-red); }
+
+    .card-sub {
+      color: var(--text-ink);
+      opacity: 0.7;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+      letter-spacing: 0.5px;
+    }
+
+    /* Input Field Adjustments */
+    .field label {
+      color: var(--text-ink);
+      font-weight: 600;
+    }
+
+    .field input {
+      background: var(--bg-cream);
+      border: 1px solid var(--bg-cream-2);
+      color: var(--text-ink);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--accent-red); /* Primary Accent */
+      border: none;
+      color: #fff;
+      padding: 0.9rem;
+      font-family: var(--font-title);
+      font-size: 1.2rem;
+      letter-spacing: 3px;
+      cursor: none;
+      transition: background 0.2s;
+      clip-path: var(--clip-md);
+      margin-top: 0.5rem;
+    }
+
+    .btn-submit:hover { 
+      background: var(--accent-red-deep); /* Hover State */
+    }
+
+    .bottom-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-ink);
+    }
+
+    .bottom-link a { 
+      color: var(--accent-red); 
+      font-weight: 700; 
+      text-decoration: none;
+    }
+
+    .bottom-link a:hover {
+        text-decoration: underline;
+    }
+
+    .deco {
+      position: absolute;
+      right: -10px; bottom: 0;
+      font-family: var(--font-title);
+      font-size: 14rem;
+      color: var(--bg-cream-2); /* Subtle contrast against white card */
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+      opacity: 0.3;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    /* Updating the Cursor to match the Red accent */
+    .cursor { background: var(--accent-red); }
+    .cursor-ring { border: 2px solid var(--accent-red); }
+
+    /* Updating background grid to use Cream 2 */
+    .grid-bg {
+        background-image: linear-gradient(var(--bg-cream-2) 1px, transparent 1px),
+                          linear-gradient(90deg, var(--bg-cream-2) 1px, transparent 1px);
+        opacity: 0.4;
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="grid-bg"></div>
+
+<div class="login-wrap">
+  <div class="orb" style="top:-150px; right:-100px; background: var(--accent-red); opacity: 0.05; width: 400px; height: 400px;"></div>
+  <div class="orb" style="bottom:0; left:0; background: var(--accent-red-deep); opacity: 0.05; width: 300px; height: 300px;"></div>
+
+  <div class="login-card">
+    <div class="deco">⚔</div>
+
+    <h1 class="card-title">WELCOME <span>BACK</span></h1>
+    <p class="card-sub">Enter the arena. Your points are waiting.</p>
+
+    {% if error %}
+    <div class="alert alert-error" style="background: var(--accent-red); color: white; padding: 10px; margin-bottom: 10px; border-radius: 4px;">{{ error }}</div>
+    {% endif %}
+
+    {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" style="border: 1px solid var(--bg-cream-2); padding: 10px; margin-bottom: 10px;">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="field" style="margin-bottom: 1.5rem;">
+        <label style="display: block; margin-bottom: 0.5rem;">Username</label>
+        <input type="text" name="username" placeholder="shadowcoder" required autofocus 
+               style="width: 100%; padding: 0.8rem; border-radius: 4px;">
+      </div>
+      <div class="field" style="margin-bottom: 1.5rem;">
+        <label style="display: block; margin-bottom: 0.5rem;">Password</label>
+        <input type="password" name="password" placeholder="••••••••" required
+               style="width: 100%; padding: 0.8rem; border-radius: 4px;">
+      </div>
+      <button type="submit" class="btn-submit">Enter Arena →</button>
+    </form>
+
+    <div class="bottom-link">
+      No account? <a href="{% url 'signup' %}">Join LearnIt — Free</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => {
+    mx=e.clientX; my=e.clientY;
+    cursor.style.transform=`translate(${mx-5}px,${my-5}px)`;
+  });
+  (function animRing(){
+    rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+    ring.style.transform=`translate(${rx-16}px,${ry-16}px)`;
+    requestAnimationFrame(animRing);
+  })();
+  document.querySelectorAll('a,button,input').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{ring.style.width='44px';ring.style.height='44px';});
+    el.addEventListener('mouseleave',()=>{ring.style.width='32px';ring.style.height='32px';});
+  });
+</script>
+</body>
+</html>

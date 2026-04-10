@@ -1,0 +1,448 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community — LearnIt</title>
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+<style>
+  :root {
+    --red: #C0392B;
+    --red-deep: #96281B;
+    --cream: #F0EBE1;
+    --cream2: #E0D8CC;
+    --ink: #1A1210;
+    --gray1: #8C8074;
+    --gray2: #B8AD9E;
+    --white: #FAFAF8;
+    
+    /* Mapping original logic to new palette */
+    --accent: var(--red);
+    --accent-hover: var(--red-deep);
+    --bg-main: var(--cream);
+    --bg-card: var(--white);
+    --text-main: var(--ink);
+    --text-muted: var(--gray1);
+    --border: var(--cream2);
+  }
+
+  body { 
+    cursor: none; 
+    background-color: var(--bg-main);
+    color: var(--text-main);
+  }
+
+  /* NAVBAR */
+  .navbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.85rem 2rem;
+    background: rgba(240, 235, 225, 0.92); /* Based on --cream */
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(16px);
+  }
+
+  .nav-logo {
+    font-family: var(--font-title);
+    font-size: 1.5rem;
+    letter-spacing: 3px;
+    display: flex; align-items: center; gap: 0.4rem;
+    flex-shrink: 0;
+    color: var(--ink);
+  }
+
+  .nav-logo .logo-box {
+    width: 30px; height: 30px;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; color: var(--white);
+    clip-path: var(--clip-sm);
+  }
+
+  .nav-logo span { color: var(--accent); }
+
+  /* Search bar */
+  .nav-search {
+    flex: 1;
+    max-width: 480px;
+    position: relative;
+  }
+
+  .nav-search input {
+    width: 100%;
+    background: var(--white);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    padding: 0.55rem 1rem 0.55rem 2.5rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+    cursor: none;
+  }
+
+  .nav-search input:focus { border-color: var(--accent); }
+
+  .nav-search input::placeholder { color: var(--gray2); }
+
+  .search-icon {
+    position: absolute;
+    left: 0.75rem; top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray1);
+    pointer-events: none;
+  }
+
+  .nav-right {
+    display: flex; align-items: center;
+    gap: 1rem; margin-left: auto;
+  }
+
+  /* Upload button */
+  .btn-upload {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: var(--accent);
+    border: none; color: var(--white);
+    padding: 0.5rem 1.2rem;
+    font-family: var(--font-body);
+    font-size: 0.85rem; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    cursor: none;
+    transition: background 0.2s;
+    clip-path: var(--clip-sm);
+    text-decoration: none;
+  }
+
+  .btn-upload:hover { background: var(--accent-hover); }
+
+  /* Profile avatar button */
+  .nav-profile {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    overflow: hidden;
+    cursor: none;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.2s, transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .nav-profile:hover { border-color: var(--ink); transform: scale(1.05); }
+
+  .nav-profile img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+
+  .nav-profile-ph {
+    width: 100%; height: 100%;
+    background: var(--cream2);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.9rem;
+    color: var(--accent);
+  }
+
+  /* MAIN LAYOUT */
+  .page-wrap {
+    padding: 5.5rem 2rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+
+  .tab-btn {
+    background: transparent;
+    border: none; border-bottom: 2px solid transparent;
+    color: var(--gray1);
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-body);
+    font-size: 0.85rem; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    cursor: none;
+    transition: color 0.2s, border-color 0.2s;
+    margin-bottom: -1px;
+  }
+
+  .tab-btn:hover { color: var(--ink); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* POST CARDS GRID */
+  .posts-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .post-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 1.25rem 1.5rem;
+    clip-path: var(--clip-md);
+    transition: border-color 0.25s, transform 0.25s;
+    text-decoration: none;
+    color: var(--ink);
+    display: block;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .post-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+
+  .post-card:hover { border-color: var(--gray2); transform: translateY(-2px); }
+  .post-card:hover::before { transform: scaleX(1); }
+
+  /* Solved logic using red-deep for distinction */
+  .post-card.solved { border-color: var(--gray2); }
+  .post-card.solved::before { background: var(--gray1); transform: scaleX(1); }
+
+  .post-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .post-title {
+    font-family: var(--font-title);
+    font-size: 1.25rem;
+    letter-spacing: 1.5px;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+
+  .post-status {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    padding: 0.2rem 0.6rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .status-open   { color: var(--red); background: rgba(192, 57, 43, 0.1); border: 1px solid var(--red); }
+  .status-solved { color: var(--gray1); background: var(--cream2); border: 1px solid var(--gray2); }
+
+  .post-desc {
+    font-size: 0.9rem;
+    color: var(--gray1);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .post-meta {
+    display: flex; align-items: center;
+    gap: 1.25rem; flex-wrap: wrap;
+  }
+
+  .post-author {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.8rem; color: var(--gray1);
+  }
+
+  .author-avatar {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    object-fit: cover;
+  }
+
+  .author-avatar-ph {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    background: var(--cream2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.6rem; font-weight: 700; color: var(--accent);
+  }
+
+  .post-time { font-size: 0.75rem; color: var(--gray2); font-family: var(--font-mono); }
+
+  .post-pts {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--red-deep);
+    margin-left: auto;
+  }
+
+  .post-comments {
+    font-size: 0.75rem; color: var(--gray1);
+    display: flex; align-items: center; gap: 0.3rem;
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+    color: var(--gray1);
+  }
+
+  .empty-icon {
+    font-family: var(--font-title);
+    font-size: 5rem;
+    color: var(--cream2);
+    margin-bottom: 1rem;
+    animation: float 4s ease-in-out infinite;
+  }
+
+  .empty-title {
+    font-family: var(--font-title);
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+    margin-bottom: 0.5rem;
+    color: var(--ink);
+  }
+
+  .empty-title span { color: var(--accent); }
+  .empty-sub { font-size: 0.9rem; line-height: 1.7; }
+
+  @media (max-width: 768px) {
+    .navbar { gap: 0.75rem; padding: 0.75rem 1rem; }
+    .nav-search { max-width: 100%; }
+    .page-wrap { padding: 5rem 1rem 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="grid-bg"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="/" class="nav-logo">
+    <div class="logo-box">LI</div>
+    LEARN<span>IT</span>
+  </a>
+
+  <div class="nav-search">
+    <svg class="search-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Search problems..." id="searchInput">
+  </div>
+
+  <div class="nav-right">
+    <a href="{% url 'upload_post' community.slug %}" class="btn-upload">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      Post Problem
+    </a>
+    <a href="{% url 'profile' %}" class="nav-profile">
+      {% if user.profile.avatar %}
+        <img src="{{ user.profile.avatar.url }}" alt="profile">
+      {% else %}
+        <div class="nav-profile-ph">{{ user.username|first|upper }}</div>
+      {% endif %}
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="page-wrap">
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'explore')">Explore</button>
+    <button class="tab-btn" onclick="switchTab(this,'trending')">Trending</button>
+    <button class="tab-btn" onclick="switchTab(this,'solved')">Solved</button>
+  </div>
+
+  <!-- Posts -->
+  <div class="posts-grid" id="postsGrid">
+
+    {% if posts %}
+      {% for post in posts %}
+      <a href="{% url 'post_detail' post.id %}" class="post-card {% if post.is_solved %}solved{% endif %}">
+        <div class="post-header">
+          <div class="post-title">{{ post.title }}</div>
+          <span class="post-status {% if post.is_solved %}status-solved{% else %}status-open{% endif %}">
+            {% if post.is_solved %}Solved{% else %}Open{% endif %}
+          </span>
+        </div>
+        <p class="post-desc">{{ post.description }}</p>
+        <div class="post-meta">
+          <div class="post-author">
+            {% if post.author.profile.avatar %}
+              <img src="{{ post.author.profile.avatar.url }}" class="author-avatar" alt="">
+            {% else %}
+              <div class="author-avatar-ph">{{ post.author.username|first|upper }}</div>
+            {% endif %}
+            {{ post.author.username }}
+          </div>
+          <span class="post-time">{{ post.created_at|timesince }} ago</span>
+          <span class="post-comments">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            {{ post.comments.count }}
+          </span>
+          <span class="post-pts">+{{ post.reward_points }} pts</span>
+        </div>
+      </a>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">⚔</div>
+        <div class="empty-title">NO POSTS <span>YET</span></div>
+        <p class="empty-sub">Be the first to post a problem.<br>Spend 10 points — earn them back when someone solves it.</p>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<script>
+  /* Cursor */
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => {
+    mx=e.clientX; my=e.clientY;
+    cursor.style.transform=`translate(${mx-5}px,${my-5}px)`;
+  });
+  (function animRing(){
+    rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+    ring.style.transform=`translate(${rx-16}px,${ry-16}px)`;
+    requestAnimationFrame(animRing);
+  })();
+  document.querySelectorAll('a,button,input').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{ring.style.width='44px';ring.style.height='44px';});
+    el.addEventListener('mouseleave',()=>{ring.style.width='32px';ring.style.height='32px';});
+  });
+
+  /* Tabs */
+  function switchTab(btn, tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  /* Search filter */
+  document.getElementById('searchInput').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.post-card').forEach(card => {
+      const title = card.querySelector('.post-title').textContent.toLowerCase();
+      card.style.display = title.includes(q) ? 'block' : 'none';
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join {{ community.name }} — LearnIt</title>
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <style>
+    :root {
+      --cream: #F0EBE1;
+      --cream2: #E0D8CC;
+      --ink: #1A1210;
+      --red: #C0392B;
+      --red-deep: #96281B;
+      --white: #FAFAF8;
+    }
+
+    .join-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      background: var(--cream);
+    }
+
+    .join-card {
+      background: var(--white);
+      border: 1px solid var(--cream2);
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 500px;
+      position: relative;
+      z-index: 1;
+      clip-path: var(--clip-lg);
+      box-shadow: 0 10px 30px rgba(26, 18, 16, 0.08);
+    }
+
+    .join-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--red), transparent);
+    }
+
+    .card-title {
+      font-family: var(--font-title);
+      font-size: 2.5rem;
+      letter-spacing: 3px;
+      margin-bottom: 0.25rem;
+      color: var(--ink);
+    }
+
+    .card-title span { 
+      color: var(--red); 
+    }
+
+    .card-sub {
+      color: #555;
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+
+    .field label {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    input[type="text"] {
+      background: var(--white);
+      border: 1px solid var(--cream2);
+      color: var(--ink);
+    }
+
+    input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.15);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--red);
+      border: none;
+      color: white;
+      padding: 0.95rem;
+      font-family: var(--font-title);
+      font-size: 1.2rem;
+      letter-spacing: 3px;
+      cursor: none;
+      transition: all 0.2s;
+      clip-path: var(--clip-md);
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-submit:hover {
+      background: var(--red-deep);
+      transform: translateY(-2px);
+    }
+
+    .btn-back {
+      background: transparent;
+      border: 1px solid var(--cream2);
+      color: var(--ink);
+      padding: 0.75rem 1.5rem;
+      font-family: var(--font-title);
+      font-size: 1rem;
+      letter-spacing: 2px;
+      cursor: none;
+      transition: all 0.2s;
+      clip-path: var(--clip-sm);
+    }
+
+    .btn-back:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(192, 57, 43, 0.05);
+    }
+
+    .bottom-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .bottom-link a { 
+      color: var(--red); 
+      font-weight: 700; 
+    }
+
+    /* Orbs - changed to red theme */
+    .orb-blue-lg, .orb-blue-sm {
+      background: radial-gradient(circle, rgba(192,57,43,0.15) 0%, transparent 70%);
+    }
+
+    @media (max-width: 500px) {
+      .join-card {
+        padding: 2rem;
+      }
+      .card-title {
+        font-size: 1.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="grid-bg"></div>
+
+<div class="join-wrap">
+  <div class="orb orb-blue-lg" style="top:-100px;right:-50px;"></div>
+  <div class="orb orb-blue-sm" style="bottom:50px;left:5%;"></div>
+
+  <div class="join-card">
+    <h1 class="card-title">JOIN <span>{{ community.name }}</span></h1>
+    <p class="card-sub">This is a private community. Enter the join code to gain access.</p>
+
+    {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="field">
+        <label>Join Code</label>
+        <input type="text" name="join_code" placeholder="Enter the code..." required>
+      </div>
+
+      <button type="submit" class="btn-submit">
+        Join Community
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+
+      <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+        <a href="{% url 'explore_communities' %}" class="btn-back">← Back to Communities</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Your existing cursor script remains unchanged
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+
+  document.addEventListener('mousemove', e => {
+    mx=e.clientX; my=e.clientY;
+    cursor.style.transform=`translate(${mx-5}px,${my-5}px)`;
+  });
+
+  (function animRing(){
+    rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+    ring.style.transform=`translate(${rx-16}px,${ry-16}px)`;
+    requestAnimationFrame(animRing);
+  })();
+
+  document.querySelectorAll('a,button,input').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{ring.style.width='44px';ring.style.height='44px';});
+    el.addEventListener('mouseleave',()=>{ring.style.width='32px';ring.style.height='32px';});
+  });
+</script>
+
+</body>
+</html>

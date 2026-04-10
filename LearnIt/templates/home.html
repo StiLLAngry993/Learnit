@@ -1,0 +1,572 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LearnIt — Solve. Earn. Dominate.</title>
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+<style>
+:root {
+  --red: #C0392B;
+  --red-deep: #96281B;
+  --cream: #F0EBE1;
+  --cream2: #E0D8CC;
+  --ink: #1A1210;
+  --gray1: #8C8074;
+  --gray2: #B8AD9E;
+  --white: #FAFAF8;
+
+  --font-title: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+
+  --clip-sm: polygon(
+    4px 0,
+    100% 0,
+    100% calc(100% - 4px),
+    calc(100% - 4px) 100%,
+    0 100%,
+    0 4px
+  );
+
+  --clip-md: polygon(
+    10px 0,
+    100% 0,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    0 100%,
+    0 10px
+  );
+}
+
+/* BASE */
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+/* NAV */
+.nav-cta {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8rem 3rem 4rem;
+  position: relative;
+  overflow: hidden;
+  background: var(--cream);
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(224,216,204,0.6) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224,216,204,0.6) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 860px;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--white);
+  border: 1px solid var(--cream2);
+  color: var(--red);
+  padding: 0.3rem 1rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  clip-path: var(--clip-sm);
+}
+
+.hero-tag::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--red);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.hero-title {
+  font-family: var(--font-title);
+  font-size: clamp(4rem, 10vw, 9rem);
+  line-height: 0.9;
+  letter-spacing: 4px;
+  margin-bottom: 1.5rem;
+  color: var(--ink);
+}
+
+.hero-title .accent {
+  color: var(--red);
+}
+
+.text-red {
+  color: var(--red);
+}
+
+.badge-accent {
+  color: var(--red);
+  background: var(--cream);
+  border: 1px solid var(--red);
+}
+
+.orb-red-lg {
+  width: 500px;
+  height: 500px;
+  background: rgba(192, 57, 43, 0.04);
+}
+
+.orb-red-sm {
+  width: 250px;
+  height: 250px;
+  background: rgba(192, 57, 43, 0.02);
+}
+
+.hero-title .stroke {
+  -webkit-text-stroke: 1px var(--ink);
+  color: transparent;
+}
+
+.hero-sub {
+  font-size: 1.1rem;
+  color: var(--gray1);
+  max-width: 520px;
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+}
+
+/* SCROLL INDICATOR */
+.scroll-line {
+  position: absolute;
+  bottom: 2rem;
+  left: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 2;
+}
+
+.scroll-text {
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gray1);
+  writing-mode: vertical-rl;
+}
+
+.scroll-bar {
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(to bottom, var(--red), transparent);
+}
+
+/* STATS */
+.stats-bar {
+  display: flex;
+  gap: 3rem;
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--cream2);
+  flex-wrap: wrap;
+}
+
+.stat-num {
+  font-family: var(--font-title);
+  font-size: 2.5rem;
+  color: var(--red);
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gray1);
+}
+
+/* SECTION */
+.section {
+  padding: 6rem 3rem;
+}
+
+.section-dark {
+  background: var(--white);
+  border-top: 1px solid var(--cream2);
+  border-bottom: 1px solid var(--cream2);
+}
+
+/* STEPS */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.step-card {
+  background: var(--white);
+  border: 1px solid var(--cream2);
+  padding: 2rem;
+  clip-path: var(--clip-md);
+  transition: 0.3s;
+  position: relative;
+}
+
+.step-card:hover {
+  border-color: var(--red);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(192,57,43,0.08);
+}
+
+.step-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: 0.3s;
+}
+
+.step-card:hover::before {
+  transform: scaleX(1);
+}
+
+.step-num {
+  font-family: var(--font-title);
+  font-size: 4rem;
+  color: var(--cream2);
+}
+
+.step-title {
+  font-family: var(--font-title);
+  font-size: 1.3rem;
+  color: var(--ink);
+}
+
+.step-desc {
+  color: var(--gray1);
+  line-height: 1.6;
+}
+
+/* ECONOMY */
+.economy-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.coin-big {
+  width: 120px;
+  height: 120px;
+  border: 3px solid var(--red);
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-title);
+  font-size: 2rem;
+}
+
+.coin-label {
+  color: var(--red);
+}
+
+.rule-item {
+  display: flex;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  background: var(--white);
+  border: 1px solid var(--cream2);
+  border-left: 2px solid transparent;
+  transition: 0.2s;
+}
+
+.rule-item:hover {
+  border-left-color: var(--red);
+    background: var(--white);
+/* CTA */
+.cta-section {
+  text-align: center;
+  padding: 6rem 3rem;
+  background: var(--cream);
+  position: relative;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at center,
+    rgba(224,216,204,0.6) 0%,
+    transparent 70%);
+}
+
+.cta-title {
+  font-family: var(--font-title);
+  font-size: clamp(3rem, 7vw, 6rem);
+  color: var(--ink);
+  position: relative;
+}
+
+.cta-sub {
+  color: var(--gray1);
+  position: relative;
+}
+
+.cta-btns {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--cream2);
+  padding: 2rem 3rem;
+  background: var(--white);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  color: var(--gray1);
+}
+
+.footer-logo {
+  font-family: var(--font-title);
+  color: var(--ink);
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-links a {
+  color: var(--gray1);
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  color: var(--red);
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .hero {
+    padding: 7rem 1.5rem 4rem;
+  }
+
+  .section {
+    padding: 4rem 1.5rem;
+  }
+
+  .economy-grid {
+    grid-template-columns: 1fr;
+  }
+
+  footer {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .scroll-line {
+    display: none;
+  }
+}
+</style>
+
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="grid-bg"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">
+    <div class="logo-box">LI</div>
+    LEARN<span>IT</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#how" class="active">How It Works</a></li>
+    <li><a href="#points">Points</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="{% url 'login' %}" class="btn btn-ghost">Log In</a>
+    <a href="{% url 'signup' %}" class="btn btn-primary">Get Started</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+<div class="orb orb-red-lg" style="top:-100px;right:-100px;"></div>
+      <div class="orb orb-red-sm" style="bottom:100px;left:5%;"></div>
+
+  <div class="hero-content">
+    <div class="hero-tag">Point-Based Code Community</div>
+    <h1 class="hero-title">
+      <span class="accent">SOLVE</span><br>
+      <span class="stroke">EARN</span><br>
+      DOMINATE
+    </h1>
+    <p class="hero-sub">
+      Post your Django problems. Earn points by solving others.
+      A self-sustaining code arena where your skills have real value.
+    </p>
+    <div class="hero-cta">
+      <a href="{% url 'signup' %}" class="btn btn-primary btn-lg">
+        Get Started Free
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#how" class="btn btn-ghost btn-lg">See How It Works</a>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div><div class="stat-num">300</div><div class="stat-label">Free Points on Signup</div></div>
+    <div><div class="stat-num">10+</div><div class="stat-label">Min Reward Per Solve</div></div>
+    <div><div class="stat-num">Django</div><div class="stat-label">Powered Platform</div></div>
+    <div><div class="stat-num">∞</div><div class="stat-label">Problems to Solve</div></div>
+  </div>
+
+  <div class="scroll-line">
+    <div class="scroll-bar"></div>
+    <span class="scroll-text">Scroll</span>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="section-label">The System</div>
+  <h2 class="section-title">HOW IT <span>WORKS</span></h2>
+
+  <div class="steps">
+    <div class="step-card fade-up">
+      <div class="step-num">01</div>
+      <div class="step-title">Sign Up → 300 Points</div>
+      <p class="step-desc">Create your account and receive 300 points instantly. Build your profile and enter the arena.</p>
+    </div>
+    <div class="step-card fade-up" style="transition-delay:.1s">
+      <div class="step-num">02</div>
+      <div class="step-title">Post Your Problem</div>
+      <p class="step-desc">Upload your Django code with a description. Spend points to post — keeps things quality, no spam.</p>
+    </div>
+    <div class="step-card fade-up" style="transition-delay:.2s">
+      <div class="step-num">03</div>
+      <div class="step-title">Community Solves It</div>
+      <p class="step-desc">Other developers submit solutions in the comments. You review them all and choose the best one.</p>
+    </div>
+    <div class="step-card fade-up" style="transition-delay:.3s">
+      <div class="step-num">04</div>
+      <div class="step-title">Reward the Winner</div>
+      <p class="step-desc">Award at least 10 points to your chosen solver. Points flow from you to them — real stakes.</p>
+    </div>
+    <div class="step-card fade-up" style="transition-delay:.4s">
+      <div class="step-num">05</div>
+      <div class="step-title">Zero Points? Solve First</div>
+      <p class="step-desc">Ran out? You can't post until you earn them back. Solve problems, gain points, stay in the game.</p>
+    </div>
+  </div>
+</section>
+
+<!-- POINT ECONOMY -->
+<section class="section section-dark" id="points">
+  <div class="section-label">The Economy</div>
+  <h2 class="section-title">POINT <span>SYSTEM</span></h2>
+
+  <div class="economy-grid">
+    <div class="coin-display">
+      <div class="coin-big">PTS</div>
+      <div class="coin-label">LearnIt Points</div>
+    </div>
+    <div class="fade-up">
+      <div class="rule-item"><span class="badge badge-accent">+300</span><span class="rule-text">Sign up bonus — no strings attached.</span></div>
+      <div class="rule-item"><span class="badge badge-green">EARN</span><span class="rule-text">Get chosen as best solver → receive 10+ points.</span></div>
+      <div class="rule-item"><span class="badge badge-red">SPEND</span><span class="rule-text">Posting a problem costs points. Make it worth it.</span></div>
+      <div class="rule-item"><span class="badge badge-red">ZERO</span><span class="rule-text">Zero points = solving only, no posting.</span></div>
+      <div class="rule-item"><span class="badge badge-green">FREE</span><span class="rule-text">Solving is always free. Grind back from zero.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-title">READY TO <span class="text-red">DUEL?</span></h2>
+  <p class="cta-sub">Sign up free. Get 300 points. Post or solve — your call.</p>
+  <div class="cta-btns">
+    <a href="{% url 'signup' %}" class="btn btn-primary btn-lg">
+      Create Account — Free
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+    <a href="{% url 'login' %}" class="btn btn-ghost btn-lg">Log In</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">LEARN<span class="text-red">IT</span></div>
+  <div>© 2025 LearnIt. Built with Django.</div>
+  <div class="footer-links">
+    <a href="#">About</a>
+    <a href="#">Rules</a>
+    <a href="#">Contact</a>
+  </div>
+</footer>
+
+<script>
+  /* Cursor */
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx=0, my=0, rx=0, ry=0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.transform = `translate(${mx-5}px,${my-5}px)`;
+  });
+  (function animRing() {
+    rx += (mx-rx)*0.12; ry += (my-ry)*0.12;
+    ring.style.transform = `translate(${rx-16}px,${ry-16}px)`;
+    requestAnimationFrame(animRing);
+  })();
+  document.querySelectorAll('a,button').forEach(el => {
+    el.addEventListener('mouseenter', () => { ring.style.width='44px'; ring.style.height='44px'; });
+    el.addEventListener('mouseleave', () => { ring.style.width='32px'; ring.style.height='32px'; });
+  });
+
+  /* Fade up on scroll */
+  const obs = new IntersectionObserver(
+    es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }),
+    { threshold: 0.1 }
+  );
+  document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

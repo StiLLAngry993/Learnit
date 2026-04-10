@@ -1,0 +1,151 @@
+/* ============================================
+   LearnIt — Color Theme
+   Cream & Red palette
+   ============================================ */
+
+:root {
+  /* ── Core palette ── */
+  --cream:       #F0EBE1;   /* main background          */
+  --cream-2:     #E0D8CC;   /* secondary bg, borders    */
+  --ink:         #1A1210;   /* primary text             */
+  --red:         #C0392B;   /* primary accent           */
+  --red-deep:    #96281B;   /* hover states, depth      */
+  --white:       #FAFAF8;   /* cards, input fields      */
+
+  /* ── Aliases (maps old variable names → new values) ── */
+
+  /* Backgrounds */
+  --dark:        var(--cream);
+  --bg:          var(--cream);
+  --bg2:         var(--cream-2);
+
+  /* Text */
+  --white-text:  var(--ink);       /* was #fff — now dark ink on light bg */
+  --gray:        #6B5C55;          /* muted text (warm mid-tone)           */
+  --gray2:       #B5A99E;          /* faint borders, inactive steps        */
+
+  /* Accent — replaces --blue everywhere */
+  --blue:        var(--red);
+  --blue-dim:    var(--red-deep);
+
+  /* Status */
+  --success:     #2E7D32;
+
+  /* ── Typography ── */
+  --font-title:  'Rajdhani', 'Orbitron', sans-serif;
+  --font-body:   'Inter', 'Segoe UI', sans-serif;
+  --font-mono:   'JetBrains Mono', 'Fira Code', monospace;
+
+  /* ── Clip paths ── */
+  --clip-lg:     polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  --clip-sm:     polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+
+/* ── Global resets ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  cursor: none;
+}
+
+/* ── Grid background ── */
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--cream-2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--cream-2) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.5;
+  z-index: 0;
+}
+
+/* ── Orbs ── */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+.orb-blue-lg { width: 400px; height: 400px; background: rgba(192, 57, 43, 0.12); }
+.orb-blue-sm { width: 200px; height: 200px; background: rgba(192, 57, 43, 0.08); }
+
+/* ── Custom cursor ── */
+.cursor {
+  position: fixed;
+  width: 10px; height: 10px;
+  background: var(--red);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transition: transform 0.05s;
+}
+
+.cursor-ring {
+  position: fixed;
+  width: 32px; height: 32px;
+  border: 1.5px solid var(--red);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transition: width 0.2s, height 0.2s;
+  opacity: 0.6;
+}
+
+/* ── Form fields ── */
+.field { margin-bottom: 1rem; }
+
+.field label {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--gray);
+  margin-bottom: 0.4rem;
+}
+
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  background: var(--white);
+  border: 1px solid var(--cream-2);
+  color: var(--ink);
+  padding: 0.65rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  border-radius: 2px;
+}
+
+.field input::placeholder,
+.field textarea::placeholder { color: var(--gray2); }
+
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.1);
+}
+
+/* ── Alert ── */
+.alert {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.88rem;
+  border-left: 3px solid var(--red);
+  background: rgba(192, 57, 43, 0.06);
+  color: var(--ink);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--cream-2); }
+::-webkit-scrollbar-thumb { background: var(--red); border-radius: 2px; }
