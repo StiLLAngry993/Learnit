@@ -3,12 +3,11 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Change this in production — never share this key publicly!
 SECRET_KEY = 'django-insecure--*wg(^2ir0isvz(^4mrbkqvv21$r)amqis^+ab2f55j!kp*9ml'
 
-DEBUG = False  # changed from True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']  # fixed the syntax error you had
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -17,6 +16,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary',
+    'cloudinary_storage',
     'main',
 ]
 
@@ -78,5 +79,14 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Cloudinary
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dme8owqwo',
+    'API_KEY': '851257284764417',
+    'API_SECRET': '-gKvDt866PfnHjtW6LvO-8faJ80',
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
