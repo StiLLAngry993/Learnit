@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Change this in production — never share this key publicly!
 SECRET_KEY = 'django-insecure--*wg(^2ir0isvz(^4mrbkqvv21$r)amqis^+ab2f55j!kp*9ml'
 
-DEBUG = True  # changed from True
+DEBUG = False  # changed from True
 
 ALLOWED_HOSTS = ['*']  # fixed the syntax error you had
 
