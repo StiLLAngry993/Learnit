@@ -1,1 +1,1 @@
-web: gunicorn LearnIt.wsgi
+web: python manage.py migrate && gunicorn LearnIt.wsgi
